@@ -4,7 +4,14 @@ import com.example.energylevel.model.Elvl;
 import com.example.energylevel.model.Quote;
 import com.example.energylevel.repository.ElvlRepository;
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +22,28 @@ public class ElvlServiceImpl implements ElvlService {
   private final ElvlRepository elvlRepository;
 
   @Override
+  public Optional<Elvl> getElvl(String isin) {
+    return elvlRepository.findById(isin);
+  }
+
+  @Override
   @Transactional
   public Elvl calculateElvl(Quote quote) {
     return elvlRepository
         .findById(quote.getIsin())
         .map(elvl -> calculateElvl(quote, elvl))
         .orElseGet(() -> createElvl(quote));
+  }
+
+  @Override
+  public List<Elvl> getAllElvls(Integer pageNo, Integer pageSize, String sortBy) {
+    Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+    Page<Elvl> pagedResult = elvlRepository.findAll(paging);
+    if (pagedResult.hasContent()) {
+      return pagedResult.getContent();
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   private Elvl calculateElvl(Quote quote, Elvl elvl) {
