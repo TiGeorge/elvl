@@ -9,7 +9,7 @@ public interface ElvlService {
 
   Optional<Elvl> getElvl(String isin);
 
-  List<Elvl> getAllElvls(Integer pageNo, Integer pageSize, String sortBy);
+  List<Elvl> getAllElvls(Integer pageNo, Integer pageSize);
 
   Elvl calculateElvl(Quote quote);
 }

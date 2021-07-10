@@ -36,8 +36,8 @@ public class ElvlServiceImpl implements ElvlService {
   }
 
   @Override
-  public List<Elvl> getAllElvls(Integer pageNo, Integer pageSize, String sortBy) {
-    Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+  public List<Elvl> getAllElvls(Integer pageNo, Integer pageSize) {
+    Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("isin"));
     Page<Elvl> pagedResult = elvlRepository.findAll(paging);
     if (pagedResult.hasContent()) {
       return pagedResult.getContent();

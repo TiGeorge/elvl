@@ -6,10 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
@@ -29,7 +26,10 @@ public class ElvlsController {
   }
 
   @GetMapping
-  public List<Elvl> getAllElvls(Integer pageNo, Integer pageSize, String sortBy) {
-    return elvlService.getAllElvls(pageNo, pageSize, sortBy);
+  public List<Elvl> getAllElvls(
+      @RequestParam(defaultValue = "0") int pageNo,
+      @RequestParam(defaultValue = "10") int pageSize) {
+
+    return elvlService.getAllElvls(pageNo, pageSize);
   }
 }
