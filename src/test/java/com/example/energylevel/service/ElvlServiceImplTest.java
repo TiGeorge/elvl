@@ -20,7 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@DisplayName("Elvl service test")
+@DisplayName("ElvlService test")
 @ExtendWith(MockitoExtension.class)
 class ElvlServiceImplTest {
 
