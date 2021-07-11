@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.*;
 
+/** Модель elvl */
 @Getter
 @Setter
 @NoArgsConstructor

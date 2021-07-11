@@ -1,10 +1,15 @@
 package com.example.energylevel.service;
 
-import com.example.energylevel.dto.QuoteDto;
 import com.example.energylevel.model.Quote;
 
+/** Сервис для роботы с котировками */
 public interface QuoteService {
 
-  Quote saveQuote(QuoteDto quoteDto);
-
+  /**
+   * Сохраняет котировку в базу данных
+   *
+   * @param quote Котировка для обработки
+   * @return Обработанная котировка
+   */
+  Quote saveQuote(Quote quote);
 }

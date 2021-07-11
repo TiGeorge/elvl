@@ -2,7 +2,7 @@ package com.example.energylevel.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,6 +13,8 @@ import com.example.energylevel.repository.ElvlRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,14 +27,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ElvlServiceImplTest {
 
   @Mock private ElvlRepository elvlRepository;
+  @Mock private QuoteService quoteService;
 
   private ElvlService sut;
 
   @BeforeEach
   void setup() {
-    sut = new ElvlServiceImpl(elvlRepository);
+    sut = new ElvlServiceImpl(elvlRepository, quoteService);
   }
 
+  @SneakyThrows
   @Test
   @DisplayName("Should be elvl = bid when bid > elvl")
   void should_BeCorrectCalculation_whenBidLessThanElvl() {
@@ -41,7 +45,7 @@ class ElvlServiceImplTest {
         .thenReturn(Optional.of(new Elvl("RU0000000001", getDecimal(5), getDateTime(9))));
     Quote quote = getQuote(getDecimal(10));
     // Act
-    Elvl resultElvl = sut.calculateElvl(quote);
+    Elvl resultElvl = sut.processQuote(quote).get();
     // Assert
     verify(elvlRepository, times(1)).findById("RU0000000001");
     assertThat(resultElvl).isNotNull();
@@ -50,6 +54,7 @@ class ElvlServiceImplTest {
     assertThat(resultElvl.getTimestamp()).isEqualTo(getDateTime(10));
   }
 
+  @SneakyThrows
   @Test
   @DisplayName("Should be elvl = ask when ask < elvl")
   void should_BeCorrectCalculation_whenAskLessThanElvl() {
@@ -58,7 +63,7 @@ class ElvlServiceImplTest {
         .thenReturn(Optional.of(new Elvl("RU0000000001", getDecimal(20), getDateTime(9))));
     Quote quote = getQuote(getDecimal(10));
     // Act
-    Elvl resultElvl = sut.calculateElvl(quote);
+    Elvl resultElvl = sut.processQuote(quote).get();
     // Assert
     verify(elvlRepository, times(1)).findById("RU0000000001");
     assertThat(resultElvl).isNotNull();
@@ -67,25 +72,26 @@ class ElvlServiceImplTest {
     assertThat(resultElvl.getTimestamp()).isEqualTo(getDateTime(10));
   }
 
+  @SneakyThrows
   @Test
   @DisplayName("Should be elvl = bid when elvl is absent")
   void should_BeCorrectCalculation_whenElvlIsAbsent() {
     // Arrange
     when(elvlRepository.findById("RU0000000001")).thenReturn(Optional.empty());
-    when(elvlRepository.save(isA(Elvl.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0, Elvl.class));
     Quote quote = getQuote(getDecimal(10));
     // Act
-    Elvl resultElvl = sut.calculateElvl(quote);
+    Elvl resultElvl = sut.processQuote(quote).get();
     // Assert
     verify(elvlRepository, times(1)).findById("RU0000000001");
-    verify(elvlRepository, times(1)).save(any(Elvl.class));
+    verify(elvlRepository, times(1))
+        .insertElvl(anyString(), any(BigDecimal.class), any(LocalDateTime.class));
     assertThat(resultElvl).isNotNull();
     assertThat(resultElvl.getIsin()).isEqualTo("RU0000000001");
     assertThat(resultElvl.getElvl()).isEqualTo(getDecimal(10));
     assertThat(resultElvl.getTimestamp()).isEqualTo(getDateTime(10));
   }
 
+  @SneakyThrows
   @Test
   @DisplayName("Should be elvl = bid when bid is absent")
   void should_BeCorrectCalculation_whenBidIsAbsent() {
@@ -94,13 +100,18 @@ class ElvlServiceImplTest {
         .thenReturn(Optional.of(new Elvl("RU0000000001", getDecimal(5), getDateTime(9))));
     Quote quote = getQuote(null);
     // Act
-    Elvl resultElvl = sut.calculateElvl(quote);
+    Elvl resultElvl = sut.processQuote(quote).get();
     // Assert
     verify(elvlRepository, times(1)).findById("RU0000000001");
     assertThat(resultElvl).isNotNull();
     assertThat(resultElvl.getIsin()).isEqualTo("RU0000000001");
     assertThat(resultElvl.getElvl()).isEqualTo(getDecimal(15));
     assertThat(resultElvl.getTimestamp()).isEqualTo(getDateTime(10));
+  }
+
+  @AfterEach
+  void teardown() {
+    elvlRepository.deleteAll();
   }
 
   private LocalDateTime getDateTime(int hour) {

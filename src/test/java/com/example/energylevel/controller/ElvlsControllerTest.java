@@ -10,6 +10,7 @@ import com.example.energylevel.repository.ElvlRepository;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,5 +85,10 @@ class ElvlsControllerTest {
         .andExpect(jsonPath("$[1].isin").value("RU0000000002"))
         .andExpect(jsonPath("$[1].elvl").value("66.66"))
         .andExpect(jsonPath("$[1].timestamp").value("2021-11-11T11:11:00"));
+  }
+
+  @AfterEach
+  void teardown() {
+    elvlRepository.deleteAll();
   }
 }

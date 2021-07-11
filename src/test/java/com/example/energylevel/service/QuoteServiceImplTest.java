@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.*;
 
-import com.example.energylevel.dto.QuoteDto;
 import com.example.energylevel.model.Quote;
 import com.example.energylevel.repository.QuoteRepository;
 import java.math.BigDecimal;
@@ -41,11 +40,15 @@ class QuoteServiceImplTest {
     // Arrange
     when(quoteRepository.save(isA(Quote.class)))
         .thenAnswer(invocation -> invocation.getArgument(0, Quote.class));
-    QuoteDto quoteDto =
-        new QuoteDto(
-            "RU0000000001", BigDecimal.ONE, BigDecimal.TEN, LocalDateTime.of(2021, 10, 10, 10, 10));
+    Quote quote =
+        new Quote(
+            null,
+            "RU0000000001",
+            BigDecimal.ONE,
+            BigDecimal.TEN,
+            LocalDateTime.of(2021, 10, 10, 10, 10));
     // Act
-    Quote resultQuote = sut.saveQuote(quoteDto);
+    Quote resultQuote = sut.saveQuote(quote);
     // Assert
     verify(quoteRepository, times(1)).save(any(Quote.class));
     assertThat(resultQuote).isNotNull();
@@ -59,11 +62,15 @@ class QuoteServiceImplTest {
   @DisplayName("Should be a constraint violation exception when Quote incorrect")
   void should_beConstraintViolation_whenQuoteIncorrect() {
     // Arrange
-    QuoteDto quoteDto =
-      new QuoteDto(
-        "RU0000000001", BigDecimal.TEN, BigDecimal.ONE, LocalDateTime.of(2021, 10, 10, 10, 10));
+    Quote quote =
+        new Quote(
+            null,
+            "RU0000000001",
+            BigDecimal.TEN,
+            BigDecimal.ONE,
+            LocalDateTime.of(2021, 10, 10, 10, 10));
     // Act
-    Throwable thrown = catchThrowable(() -> sut.saveQuote(quoteDto));
+    Throwable thrown = catchThrowable(() -> sut.saveQuote(quote));
     // Assert
     assertThat(thrown)
         .isInstanceOf(ConstraintViolationException.class)

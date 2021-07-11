@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.*;
 
+/** Модель котировки */
 @Getter
 @Setter
 @NoArgsConstructor
