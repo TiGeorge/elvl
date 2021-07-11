@@ -47,6 +47,21 @@ class ElvlsControllerTest {
         .andExpect(jsonPath("$.timestamp").value("2021-10-10T10:10:00"));
   }
 
+  @SneakyThrows
+  @Test
+  @DisplayName("Should return error when isin doesn't exist")
+  void should_returnError_whenIsinDoesNotExist() {
+    // Arrange
+    elvlRepository.save(
+        new Elvl(
+            "RU0000000001", BigDecimal.valueOf(55.55), LocalDateTime.of(2021, 10, 10, 10, 10)));
+    // Act
+    ResultActions result =
+        mockMvc.perform(get("/elvls/RU0000000555").accept(MediaType.APPLICATION_JSON));
+    // Assert
+    result.andExpect(status().isNotFound());
+  }
+
   @Test
   @DisplayName("Should return all Elvls")
   void should_returnAllElvls() throws Exception {

@@ -28,10 +28,11 @@ public class Quote {
   @NotNull
   private BigDecimal ask;
 
+  @NotNull
   @Column(name = "time_stamp", columnDefinition = "TIMESTAMP WITH TIME ZONE")
   private LocalDateTime timestamp;
 
-  @AssertTrue
+  @AssertTrue(message = "Bid must be less than ask")
   private boolean isBidLessThanAsk() {
     return bid == null || bid.compareTo(ask) < 0;
   }

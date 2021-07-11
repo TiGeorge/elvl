@@ -27,15 +27,6 @@ public class ElvlServiceImpl implements ElvlService {
   }
 
   @Override
-  @Transactional
-  public Elvl calculateElvl(Quote quote) {
-    return elvlRepository
-        .findById(quote.getIsin())
-        .map(elvl -> calculateElvl(quote, elvl))
-        .orElseGet(() -> createElvl(quote));
-  }
-
-  @Override
   public List<Elvl> getAllElvls(Integer pageNo, Integer pageSize) {
     Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("isin"));
     Page<Elvl> pagedResult = elvlRepository.findAll(paging);
@@ -44,6 +35,15 @@ public class ElvlServiceImpl implements ElvlService {
     } else {
       return Collections.emptyList();
     }
+  }
+
+  @Override
+  @Transactional
+  public Elvl calculateElvl(Quote quote) {
+    return elvlRepository
+        .findById(quote.getIsin())
+        .map(elvl -> calculateElvl(quote, elvl))
+        .orElseGet(() -> createElvl(quote));
   }
 
   private Elvl calculateElvl(Quote quote, Elvl elvl) {
